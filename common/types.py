@@ -1,0 +1,18 @@
+__author__ = 'Christoph Gerneth'
+
+class SingletonType(type):
+    def __call__(self, *args, **kwargs):
+        try:
+            return self.__instance
+        except AttributeError:
+            self.__instance = super(SingletonType, self).__call__(*args, **kwargs)
+            return self.__instance
+
+    def _drop(self):
+        """Drop the instance (for testing purposes)."""
+        del(self.__instance)
+
+
+
+class ProcessTerminatedMessage(Warning):
+    pass
