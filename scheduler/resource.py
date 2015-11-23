@@ -28,6 +28,9 @@ class EAQueue(Resource, TimerListener):
         self.ready_processes = list()
 
     def notify(self, time):
+        self.work(time)
+
+    def work(self, time):
         """
         decrease waiting process times and check, if there is a ready process
         """
@@ -36,8 +39,10 @@ class EAQueue(Resource, TimerListener):
                 what_was_done = p.process.doWork(time)
                 print "###> EAQueue decreased wait of process", p, ":", what_was_done
             except ProcessTerminatedMessage as e:
+                # Process terminated...
+                p.setInactive()
+                what_was_done = e.last_section
                 print e.message
-                # workplan is obviously finished
             try:
                 future_section = p.process.workplan.head()  # look in the future
                 SystemTimer().next_tick_in(future_section.duration)  # tell the timer when the next interrupt will occur
@@ -49,6 +54,7 @@ class EAQueue(Resource, TimerListener):
                 if not isinstance(future_section, Wait):
                     # we are done with waiting!
                     # process can switch to ready queue if he wants to launch again...
+                    self._queue.remove(p)
                     self.ready_processes.append(p)
 
     def append(self, pcb):
@@ -82,7 +88,7 @@ class EAQueue(Resource, TimerListener):
         return iter(self._queue)
 
     def __repr__(self):
-        return "<EAQueue %s>" % "#".join(self.queue)
+        return "<EAQueue(%i) %s>" % (len(self._queue), self._queue)
 
 
 class CPU(Resource, TimerListener):
@@ -125,6 +131,9 @@ class CPU(Resource, TimerListener):
         except AttributeError:
             # no process in CPU
             print '[%i] CPU empty' % time
+        except ProcessTerminatedMessage as e:
+            # process terminated after execution
+            print "[%i] Process terminated after execution: %s" % (time, e.message)
         else:
             if isinstance(what_was_done, Launch):
                 # cpu executed launch section

@@ -179,21 +179,16 @@ class SchedulerNewTestCase(unittest.TestCase):
 
 class SchedulerNormalTestCase(unittest.TestCase):
     def setUp(self):
-        b = PCB(Process("B"))
-        b.process.workplan = Workplan().work(50)
-
         a = PCB(Process("A"))
-        a.process.workplan = Workplan().work(14).launch('B').work(10).wait(20).work(10)
-
-        # self.a, self.b = a, b
+        a.process.workplan = Workplan().work(10).wait(10).work(10)
 
     def testRun_01(self):
         scheduler = Scheduler(FiFoStubStrategy())
         scheduler.initialize("A")
         print 'run normal run 1...'
         scheduler.run()
-
-
+        process = ProcessManager().getProcessByName("A")
+        self.assertEqual(process.state, State.I)
 
     def tearDown(self):
         ProcessManager._drop()

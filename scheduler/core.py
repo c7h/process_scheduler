@@ -55,6 +55,8 @@ class Scheduler(TimerListener):
         if self.schedule():
             #there is still something to do
             SystemTimer().tick()
+        else:
+            print "FINISHED"
 
     def initialize(self, start_pcb_str):
         """
@@ -176,12 +178,12 @@ class Scheduler(TimerListener):
     def schedule(self):
 
         #check the ea queues if there are finished processes. if so, append them to the queues
-        finished_processes = self.__check_ea_queues()
-        for p in finished_processes:
+        finished_waiting_processes = self.__check_ea_queues()
+        for p in finished_waiting_processes:
             self.addToMatchingQueue(p)
         # collect information about resources
         readyq_empty = True if len(self.ready_queue) == 0 else False  # ready queue empty?
-        sum_waiting_pcbs = sum(map(lambda x: len(x), self.ea_queues))  # Sum of all PCBs in EAQueues
+
 
         #active = self.processManager.getActiveProcess()
         active = self.cpu.running_process
@@ -192,7 +194,7 @@ class Scheduler(TimerListener):
             pass
         else:
             if isinstance(next_section, Wait):
-                #process will enter wait section: dispatch
+                # process will enter wait section: dispatch
                 try:
                     next_from_queue = self.ready_queue.pop()
                 except IndexError:
@@ -202,8 +204,7 @@ class Scheduler(TimerListener):
                 self.addToMatchingQueue(waiting_pcb)
                 active = self.cpu.running_process
 
-
-
+        sum_waiting_pcbs = sum(map(lambda x: len(x), self.ea_queues))  # Sum of all PCBs in EAQueues
         if not active and readyq_empty:
             # cpu leer, runq leer
             if sum_waiting_pcbs > 0:

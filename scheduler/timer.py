@@ -23,7 +23,7 @@ class SystemTimer(object):
         self.timecounter = 0
         self.timeunit = timeunit
         self.next_temp_timeunit = timeunit # initial to timeunit
-        self.last_tick_duration = 0
+        self.last_tick_duration = 0  # the duration of the last performed tick
 
         self.__listeners = []
 
@@ -76,7 +76,7 @@ class SystemTimer(object):
     def tick(self):
         """
         make a system tick. this is used for preemptive scheduling strategies.
-        all listeners will be notified.
+        all listeners will be notified in the order or registration.
         """
         step = self.__getStepWidth()
         self.__resetStepWidth()

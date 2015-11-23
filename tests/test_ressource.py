@@ -8,6 +8,7 @@ from process.manager import ProcessManager
 from scheduler.resource import CPU, EAQueue
 
 from scheduler.timer import SystemTimer
+from common.types import ProcessTerminatedMessage
 
 
 class TestCPUCase(unittest.TestCase):
@@ -144,6 +145,17 @@ class EAQueueTestCase(unittest.TestCase):
         # process should be in queue
         ready_p_from_queue = self.queue.pickup_ready_processes()
         self.assertListEqual(ready_p_from_queue, [p])
+
+    def test_notify_finishProcess(self):
+        p = PCB(Process("Wait_finish"), state=State.L)
+
+        p.process.workplan = Workplan().work(20).wait(10)
+        p.process.doWork(20)  # get rid of work section
+        print p.process.name, "ist nun", p.process.workplan
+        self.queue.append(p)  # should also set p to waiting state
+        print "Warteschlange:", self.queue
+        self.assertRaises(ProcessTerminatedMessage, p.process.doWork, 15)
+        print "Warteschlange:", self.queue
 
 
     def tearDown(self):
