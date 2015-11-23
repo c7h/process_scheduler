@@ -2,7 +2,7 @@ __author__ = 'Christoph Gerneth'
 from random import choice
 from uuid import uuid1
 from warnings import warn
-from copy import copy
+from copy import copy, deepcopy
 
 from state import State
 
@@ -59,9 +59,9 @@ class Process(object):
         except IndexError:
             # there is no more section in workplan. Process Terminated.
             # we use a clever messaging system to inform the Scheduler as soon as a process terminated.
-            raise ProcessTerminatedMessage("Workplan empty - Process terminated!")
+            raise ProcessTerminatedMessage("Workplan empty - Process terminated!", last_section=self.__history.head())
 
-        new_history_section = copy(active_section)  # create a copy of the section
+        new_history_section = deepcopy(active_section)  # create a copy of the section
 
         if time is None:
             time = active_section.duration # work till the end of the active section (typically for FiFo)
@@ -72,7 +72,7 @@ class Process(object):
         if active_section.duration - worked_time > 0:
             # add updated section at the first place of the workplan (if time left)
             active_section.duration -= worked_time
-            self.workplan.insert(active_section)
+            self.workplan.insert(active_section) # don't touch active_section from now an...
 
         new_history_section.duration = worked_time  # time spent working...
         self.history.insert(new_history_section, i=len(self.history.plan))  # insert element at the end of the history
