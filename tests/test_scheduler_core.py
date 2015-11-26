@@ -50,6 +50,7 @@ class ConcreteSchedulerCase(unittest.TestCase):
 
 
     def test_BasisSchedler_FiFo_manyargs(self):
+        # swallow too many args without notification
         strategy = FiFo(10, 4, 10, 10, 10, 10)
         scheduler = Scheduler(strategy)
         self.assertIsInstance(scheduler, Scheduler)
@@ -60,7 +61,7 @@ class ConcreteSchedulerCase(unittest.TestCase):
 
 
     def test_BasisScheduler_MLsndFiFo(self):
-        scheduler = Scheduler(MLsecondRR(10, 4))
+        scheduler = Scheduler(MLsecondRR(timeslice=10, quantum=4))
         self.assertIsInstance(scheduler, Scheduler)
 
 
@@ -81,16 +82,18 @@ class RunScheduler(unittest.TestCase):
 
 
     def test_scheduler_01(self):
+        """If we schedule PCB02 only, it should terminate after 90ms"""
         scheduler = Scheduler(FiFoStubStrategy())
-        #scheduler.addToReadyQueue(self.pcb1)
-        scheduler.initialize('01')
+        scheduler.initialize('02')
         scheduler.run()
+        self.assertEqual(SystemTimer().timecounter, 90)
 
-    @unittest.skip
     def test_scheduler_02(self):
+        """Scheduling terminates at 110ms"""
         scheduler = Scheduler(FiFoStubStrategy())
         scheduler.initialize('01')
         scheduler.run()
+        self.assertEqual(SystemTimer().timecounter, 110)
 
 
     def test_append_to_queue(self):
@@ -114,7 +117,6 @@ class RunScheduler(unittest.TestCase):
     def tearDown(self):
         # cleanup process manager instances
         ProcessManager._drop()
-
 
 class SchedulerNewTestCase(unittest.TestCase):
     def setUp(self):
@@ -161,12 +163,6 @@ class SchedulerNewTestCase(unittest.TestCase):
         self.assertEqual(self.scheduler.cpu.running_process, None)
         # p1 section 1 is launch(02): should launch 02
 
-    def test_scheduer_initialize_02(self):
-        self.scheduler.initialize('02')  # work(90)
-        self.scheduler.schedule()
-        # after one step, init process should be moved to ready queue,
-        # and then dispatched to the cpu
-        self.assertEqual(self.scheduler.cpu.running_process, self.pcb2)
 
     def test_scheduler_run_01(self):
         self.scheduler.initialize(self.pcb1.process.name)

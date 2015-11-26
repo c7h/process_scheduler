@@ -181,8 +181,6 @@ class Scheduler(TimerListener):
         finished_waiting_processes = self.__check_ea_queues()
         for p in finished_waiting_processes:
             self.addToMatchingQueue(p)
-        # collect information about resources
-        readyq_empty = True if len(self.ready_queue) == 0 else False  # ready queue empty?
 
 
         #active = self.processManager.getActiveProcess()
@@ -196,15 +194,22 @@ class Scheduler(TimerListener):
             if isinstance(next_section, Wait):
                 # process will enter wait section: dispatch
                 try:
-                    next_from_queue = self.ready_queue.pop()
+                    next_from_ready_queue = self.ready_queue.pop()
                 except IndexError:
                     # ready queue empyt
-                    next_from_queue = None
-                waiting_pcb = self.cpu.dispatch(next_from_queue)
+                    next_from_ready_queue = None
+                waiting_pcb = self.cpu.dispatch(next_from_ready_queue)
                 self.addToMatchingQueue(waiting_pcb)
-                active = self.cpu.running_process
+                active = self.cpu.running_process # notwendig, da dispatch ausgefuehrt wurde
+            if isinstance(next_section, Launch):
+                # process will launch another process
+                self.addToMatchingQueue(active)
+                # @TODO: dispatch ist schedulingabhaengig! implementieren
 
+        # collect information about resources
         sum_waiting_pcbs = sum(map(lambda x: len(x), self.ea_queues))  # Sum of all PCBs in EAQueues
+        readyq_empty = True if len(self.ready_queue) == 0 else False  # ready queue empty?
+
         if not active and readyq_empty:
             # cpu leer, runq leer
             if sum_waiting_pcbs > 0:
