@@ -1,15 +1,12 @@
 __author__ = 'c7h'
 
 import unittest
-
 from strategy.simple import FiFo, RoundRobin
 from strategy.simple import SimpleStrategy
 from strategy.multilevel import MLsecondFiFo, MLsecondRR
-
-from scheduler.core import Scheduler, Scheduler
+from scheduler.core import Scheduler
 from scheduler.core import SchedulerFactory
 from scheduler.timer import SystemTimer
-
 from process.state import State
 from process.workplan import Workplan
 from process.process import Process, PCB
@@ -23,7 +20,6 @@ class FiFoStubStrategy(SimpleStrategy):
         The concrete schedulers are not yet implemented, so we need this mockup.
         """
 
-
     def schedule(self, scheduler):
         """
         FiFo strategies will always return the first process in a queue
@@ -36,10 +32,8 @@ class FiFoStubStrategy(SimpleStrategy):
             except:
                 return None
 
-
     def addToReadyQueue(self, scheduler, pcb):
         scheduler.ready_queue.append(pcb)
-
 
 
 class ConcreteSchedulerCase(unittest.TestCase):
@@ -47,7 +41,6 @@ class ConcreteSchedulerCase(unittest.TestCase):
         strategy = FiFo()
         scheduler = Scheduler(strategy)
         self.assertIsInstance(scheduler, Scheduler)
-
 
     def test_BasisSchedler_FiFo_manyargs(self):
         # swallow too many args without notification
@@ -59,9 +52,12 @@ class ConcreteSchedulerCase(unittest.TestCase):
         scheduler = Scheduler(RoundRobin(timeslice=10, quantum=4))
         self.assertIsInstance(scheduler, Scheduler)
 
+    def test_BasisScheduler_MLsndRR(self):
+        scheduler = Scheduler(MLsecondRR(timeslice=10, quantum=4))
+        self.assertIsInstance(scheduler, Scheduler)
 
     def test_BasisScheduler_MLsndFiFo(self):
-        scheduler = Scheduler(MLsecondRR(timeslice=10, quantum=4))
+        scheduler = Scheduler(MLsecondFiFo())
         self.assertIsInstance(scheduler, Scheduler)
 
 
@@ -80,7 +76,6 @@ class RunScheduler(unittest.TestCase):
 
         self.pcb1 = PCB(process1, state=State.B)
 
-
     def test_scheduler_01(self):
         """If we schedule PCB02 only, it should terminate after 90ms"""
         scheduler = Scheduler(FiFoStubStrategy())
@@ -94,7 +89,6 @@ class RunScheduler(unittest.TestCase):
         scheduler.initialize('01')
         scheduler.run()
         self.assertEqual(SystemTimer().timecounter, 110)
-
 
     def test_append_to_queue(self):
         scheduler = Scheduler(FiFoStubStrategy())
@@ -117,6 +111,8 @@ class RunScheduler(unittest.TestCase):
     def tearDown(self):
         # cleanup process manager instances
         ProcessManager._drop()
+        SystemTimer._drop()
+
 
 class SchedulerNewTestCase(unittest.TestCase):
     def setUp(self):
@@ -163,14 +159,13 @@ class SchedulerNewTestCase(unittest.TestCase):
         self.assertEqual(self.scheduler.cpu.running_process, None)
         # p1 section 1 is launch(02): should launch 02
 
-
     def test_scheduler_run_01(self):
         self.scheduler.initialize(self.pcb1.process.name)
         self.scheduler.run()
 
     def tearDown(self):
         ProcessManager._drop()
-
+        SystemTimer._drop()
 
 
 class SchedulerNormalTestCase(unittest.TestCase):
@@ -201,7 +196,7 @@ class FactoryTestCase(unittest.TestCase):
         self.assertIsInstance(ml_snd_RR, Scheduler,
                               'exptected type %s, got an instance of type %s instead'
                               % (Scheduler, type(ml_snd_RR))
-        )
+                              )
 
     def test_factory_possible_choices(self):
         choices = SchedulerFactory.getPossibleChoices()
