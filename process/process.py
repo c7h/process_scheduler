@@ -72,13 +72,13 @@ class Process(object):
         if active_section.duration - worked_time > 0:
             # add updated section at the first place of the workplan (if time left)
             active_section.duration -= worked_time
-            self.workplan.insert(active_section) # don't touch active_section from now an...
+            self.workplan.insert(active_section)  # don't touch active_section from now an...
 
         new_history_section.duration = worked_time  # time spent working...
         self.history.insert(new_history_section, i=len(self.history.plan))  # insert element at the end of the history
         #@TODO: append timestamp to history section
 
-        # TODO: decide if we should update system timer here or at the scheduler after call (work).
+        # - decide if we should update system timer here or at the scheduler after call (work).
         # I think we should update system timer here: It's not sure that the work-function is working for the whole time
         # it the workplan says, we work only 10ms, but the scheduler granted a timeslice for 20, we will return after 10
         # to avoid double checks, update system timer here.

@@ -15,4 +15,6 @@ class SingletonType(type):
 
 
 class ProcessTerminatedMessage(Warning):
-    pass
+    def __init__(self, *args, **kwargs):
+        self.last_section = kwargs.get("last_section")
+        super(ProcessTerminatedMessage, self).__init__(*args)
