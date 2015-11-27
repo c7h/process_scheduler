@@ -1,5 +1,6 @@
 __author__ = 'Christoph Gerneth'
 
+
 class SingletonType(type):
     def __call__(self, *args, **kwargs):
         try:
@@ -10,8 +11,8 @@ class SingletonType(type):
 
     def _drop(self):
         """Drop the instance (for testing purposes)."""
-        del(self.__instance)
-
+        self.__instance = None
+        del (self._SingletonType__instance)
 
 
 class ProcessTerminatedMessage(Warning):
