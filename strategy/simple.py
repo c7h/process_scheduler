@@ -4,7 +4,6 @@ from strategy import SimpleStrategy
 
 
 class FiFo(SimpleStrategy):
-
     def addToReadyQueue(self, scheduler, pcb):
         """
         FiFo strategy appends a process at the end of the schedulers ready queue
@@ -30,7 +29,7 @@ class RoundRobin(SimpleStrategy):
         # check type of quantum and timeslice because these are user interfaces
         assert isinstance(timeslice, int)
         assert isinstance(quantum, int)
-        #set configuration of the strategy
+        # set configuration of the strategy
         self.timeslice = timeslice
         self.quantum = quantum
 
@@ -41,7 +40,7 @@ class RoundRobin(SimpleStrategy):
         :return: PCB or None
         """
         if len(scheduler.ready_queue) > 0:
-            return scheduler.ready_queue.pop(0) # removes first pcb from ready queue and returns it
+            return scheduler.ready_queue.pop(0)  # removes first pcb from ready queue and returns it
         else:
             return None
 
