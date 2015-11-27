@@ -1,12 +1,10 @@
 __author__ = 'Christoph Gerneth'
 import sys
-
 from strategy.strategy import Strategy
 from timer import TimerListener, SystemTimer
 from resource import CPU, EAQueue
 from process.manager import ProcessManager
 from process.workplan import Work, Wait, Launch
-
 # imports used by Factory:
 from strategy.simple import FiFo, RoundRobin
 from strategy.multilevel import MLsecondRR, MLsecondFiFo
@@ -21,17 +19,16 @@ class Scheduler(TimerListener):
         assert isinstance(strategy, Strategy)
         self.howToSchedule = strategy
 
-        #timer listeners
+        # timer listeners
         self.cpu = CPU()  # that's what we want to manage
         self.processManager = ProcessManager()  # is responsible for managing processes
-        self.ea_queues = [EAQueue()]*1
+        self.ea_queues = [EAQueue()] * 1
 
         self.ready_queue = list()  # hold only processes waiting for the cpu
 
+        self.init_process = None  # you have to initialize the scheduler first
 
-        self.init_process = None # you have to initialize the scheduler first
-
-        SystemTimer().register(self)  #register at system clock
+        SystemTimer().register(self)  # register at system clock
 
         self._loop_counter = 0  # count how many time the run-method was called
 
@@ -53,7 +50,7 @@ class Scheduler(TimerListener):
         """an event occurred. On every event, we have to decide if we dispatch the running process or not"""
         print "Scheduler notified after a step of", timestamp
         if self.schedule():
-            #there is still something to do
+            # there is still something to do
             SystemTimer().tick()
         else:
             print "FINISHED"
@@ -65,7 +62,6 @@ class Scheduler(TimerListener):
         """
         self.init_process = self.processManager.getProcessByName(start_pcb_str)
 
-
     def run(self):
         """
         start the scheduler
@@ -75,13 +71,12 @@ class Scheduler(TimerListener):
         if self.init_process is None:
             raise RuntimeError("No init process found! please initialise first")
         else:
-        # on the first run, the initial process is pushed to the ready queue
-            self.addToMatchingQueue(self.init_process) # init fill the ready queue
-
+            # on the first run, the initial process is pushed to the ready queue
+            self.addToMatchingQueue(self.init_process)  # init fill the ready queue
 
         self.schedule()
-        #init process is now in CPU, time is 0
-        SystemTimer().tick() #do the first tick
+        # init process is now in CPU, time is 0
+        SystemTimer().tick()  # do the first tick
 
     def addToMatchingQueue(self, pcb):
         """
@@ -113,28 +108,24 @@ class Scheduler(TimerListener):
 
         if self.cpu.running_process is None and self._loop_counter == 0:
             # this the initial run
-            self.addToMatchingQueue(self.init_process) # init fill the ready queue
-
+            self.addToMatchingQueue(self.init_process)  # init fill the ready queue
 
         lc = self._loop_counter
         print "RUN %2i" % (self._loop_counter)
-        self._loop_counter += 1 # count the scheduling-steps
+        self._loop_counter += 1  # count the scheduling-steps
 
-
-        #check the ea queues if there are finished processes. if so, append them to the queues
+        # check the ea queues if there are finished processes. if so, append them to the queues
         finished_processes = self.__check_ea_queues()
         for p in finished_processes:
-            self.addToMatchingQueue(p) # add to ready queue
+            self.addToMatchingQueue(p)  # add to ready queue
 
-        #scheduler, decide if (and what process) we should schedule:
+        # scheduler, decide if (and what process) we should schedule:
         next_process = self.howToSchedule.schedule(self)
-
-
 
         if self.cpu.running_process:
             # if the running process want to wait, push him to the ea_queue and dispatch
             active_pcb_wp_head = self.cpu.running_process.process.workplan.head()
-            if isinstance(active_pcb_wp_head, Wait):  #Trainwreck-Alert!
+            if isinstance(active_pcb_wp_head, Wait):  # Trainwreck-Alert!
                 wait_pcb = self.cpu.dispatch(next_process)
                 self.addToMatchingQueue(wait_pcb)
                 next_run = True
@@ -142,8 +133,6 @@ class Scheduler(TimerListener):
                 # do launch
                 launching_pcb = active_pcb_wp_head.action
                 self.addToMatchingQueue(launching_pcb)
-
-
 
         # decide what to do with the next_process:
         if not self.cpu.running_process and not next_process:
@@ -163,27 +152,26 @@ class Scheduler(TimerListener):
             next_run = True
 
         elif self.cpu.running_process and next_process:
-            #cpu voll, runq voll
+            # cpu voll, runq voll
             # strategy decission was to switch context
 
             # there is a another process, which should be run
-            old_running_process = self.cpu.dispatch(next_process) # still in state L
+            old_running_process = self.cpu.dispatch(next_process)  # still in state L
             # decide what to do with the old process:
             if not old_running_process is None:
-                self.addToMatchingQueue(old_running_process) # dispatch to the right queue
+                self.addToMatchingQueue(old_running_process)  # dispatch to the right queue
             next_run = True
 
         return next_run
 
     def schedule(self):
 
-        #check the ea queues if there are finished processes. if so, append them to the queues
+        # check the ea queues if there are finished processes. if so, append them to the queues
         finished_waiting_processes = self.__check_ea_queues()
         for p in finished_waiting_processes:
             self.addToMatchingQueue(p)
 
-
-        #active = self.processManager.getActiveProcess()
+        # active = self.processManager.getActiveProcess()
         active = self.cpu.running_process
 
         try:
@@ -200,11 +188,10 @@ class Scheduler(TimerListener):
                     next_from_ready_queue = None
                 waiting_pcb = self.cpu.dispatch(next_from_ready_queue)
                 self.addToMatchingQueue(waiting_pcb)
-                active = self.cpu.running_process # notwendig, da dispatch ausgefuehrt wurde
+                active = self.cpu.running_process  # notwendig, da dispatch ausgefuehrt wurde
             if isinstance(next_section, Launch):
                 # process will launch another process
                 self.addToMatchingQueue(active)
-                # @TODO: dispatch ist schedulingabhaengig! implementieren
 
         # collect information about resources
         sum_waiting_pcbs = sum(map(lambda x: len(x), self.ea_queues))  # Sum of all PCBs in EAQueues
@@ -213,33 +200,39 @@ class Scheduler(TimerListener):
         if not active and readyq_empty:
             # cpu leer, runq leer
             if sum_waiting_pcbs > 0:
-                #but there are still waiting processes
+                # but there are still waiting processes
                 next_run = True
             else:
-                next_run = False #and no more processes in ea_queue
+                next_run = False  # and no more processes in ea_queue
         elif not active and not readyq_empty:
             # cpu leer, runq voll: dispatchen und nochmal laufen
             ready = self.ready_queue.pop()
-            self.__refilQuantum(ready) # refill quantum for next process in cpu
+            self.__refilQuantum(ready)  # refill quantum for next process in cpu
             self.cpu.dispatch(ready)
             next_run = True
-        elif active and not readyq_empty:
+        elif active and readyq_empty:
             # cpu voll, runq leer
             # there is no readyq_empty process...
             # reschedule: process in cpu belongs in cpu
             print 'reschedule process'
             self.__refilQuantum(self.cpu.running_process)
             next_run = True
-        elif active and readyq_empty:
-            next_run = self.howToSchedule.schedule(self)
+        elif active and not readyq_empty:
+            # cpu voll, runq voll
+            next_run = True
+            if SystemTimer().next_temp_timeunit != 0:
+                # we need this distinction because this happens in 2 steps...
+                strategy_result = self.howToSchedule.schedule(self)
+                if strategy_result is not active:
+                    # neuer process
+                    old = self.cpu.dispatch(strategy_result)
+                    self.addToMatchingQueue(old)
         else:
-            #unefined state
+            # unefined state
             raise RuntimeError("undefined scheduling state")
 
-        self._loop_counter += 1 # count the scheduling-steps
+        self._loop_counter += 1  # count the scheduling-steps
         return next_run
-
-
 
     def __refilQuantum(self, pcb):
         """
@@ -259,18 +252,16 @@ class Scheduler(TimerListener):
             finished_waiting_processes.extend(p)
         return finished_waiting_processes
 
-
     def addToReadyQueue(self, pcb):
         """
         add process to ready queue
         :param pcb: pcb to be added
         """
         pcb.setReady()
-        print "add process to ready queue:",pcb
+        print "add process to ready queue:", pcb
         # if rescheduled because of time quantum, add at the end, if it's because of preemption, add to the beginning
         self.howToSchedule.addToReadyQueue(scheduler=self, pcb=pcb)
         return True
-
 
 
 class SchedulerFactory(object):

@@ -6,18 +6,23 @@ from strategy import SimpleStrategy
 class FiFo(SimpleStrategy):
 
     def addToReadyQueue(self, scheduler, pcb):
-        queue = scheduler.ready_queue
-        pcb.setReady() # you can set to ready, but it's not necessary. the scheduler does it for you
-        return queue.append(pcb)
+        """
+        FiFo strategy appends a process at the end of the schedulers ready queue
+        """
+        scheduler.ready_queue.append(pcb)
 
     def schedule(self, scheduler):
         """
-        perform a schedule-step
-        :return boolean: decision for another run or not?
+        FiFo strategies will always return the first process in a queue. But because they are non-preemtive,
+        this happens only if there is no process running
         """
-        ready_process = scheduler.popFromReadyQueue()
-        ready_process.process.work()
-        return True
+        if scheduler.cpu.running_process:
+            return scheduler.cpu.running_process
+        else:
+            try:
+                return scheduler.ready_queue.pop()
+            except:
+                return None
 
 
 class RoundRobin(SimpleStrategy):
@@ -29,5 +34,22 @@ class RoundRobin(SimpleStrategy):
         self.timeslice = timeslice
         self.quantum = quantum
 
-    def schedule(self):
-        return True
+    def schedule(self, scheduler):
+        """
+        If there is at least one process in the ready queue, the first process from this queue will be scheduled
+        :param scheduler: the core scheduler. provides api access to everything you need for scheduling
+        :return: PCB or None
+        """
+        if len(scheduler.ready_queue) > 0:
+            return scheduler.ready_queue.pop(0) # removes first pcb from ready queue and returns it
+        else:
+            return None
+
+    def addToReadyQueue(self, scheduler, pcb):
+        """
+        processes are added at the end of the ready queue (Eduard Glatz. - Operating Systems p. 152)
+        :param scheduler: access to the ready queue and more....
+        :param pcb: PCB to be added to ready queue
+        :return: nothing
+        """
+        scheduler.ready_queue.append(pcb)
