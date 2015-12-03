@@ -58,6 +58,7 @@ class Workplan(object):
     def __init__(self):
         self.plan = list()
         self.__pmanager = ProcessManager()
+        self.ending_at = None # used for workplan
 
     # you can combine these functions in a row. they will get added to the plan
     def work(self, time):
@@ -101,6 +102,13 @@ class Workplan(object):
         """
         return self.plan[0]
 
+    def tail(self):
+        """
+        get the last element
+        :return: Section
+        """
+        return self.plan[-1]
+
     def insert(self, element, i=0):
         """
         insert a Section in workplan
@@ -125,6 +133,7 @@ class Workplan(object):
         except IndexError:
             pass
         return time
+
 
     def __repr__(self):
         plan = map(lambda x: repr(x), self.plan)

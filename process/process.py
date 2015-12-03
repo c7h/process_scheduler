@@ -8,6 +8,7 @@ from state import State
 
 from workplan import Workplan
 from manager import ProcessManager
+from scheduler.timer import SystemTimer
 
 from common.types import ProcessTerminatedMessage
 
@@ -75,8 +76,8 @@ class Process(object):
             self.workplan.insert(active_section)  # don't touch active_section from now an...
 
         new_history_section.duration = worked_time  # time spent working...
+        new_history_section.ending_at = SystemTimer().timecounter
         self.history.insert(new_history_section, i=len(self.history.plan))  # insert element at the end of the history
-        #@TODO: append timestamp to history section
 
         # - decide if we should update system timer here or at the scheduler after call (work).
         # I think we should update system timer here: It's not sure that the work-function is working for the whole time
