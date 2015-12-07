@@ -4,7 +4,7 @@ from strategy.strategy import Strategy
 from timer import TimerListener, SystemTimer
 from resource import CPU, EAQueue
 from process.manager import ProcessManager
-from process.workplan import Work, Wait, Launch
+from process.workplan import Work, Wait, Launch, Ready
 # imports used by Factory:
 from strategy.simple import FiFo, RoundRobin
 from strategy.multilevel import MLsecondRR, MLsecondFiFo
@@ -258,11 +258,26 @@ class Scheduler(TimerListener):
         :param pcb: pcb to be added
         """
         pcb.setReady()
+        self.__maintain_process_history(pcb)
         print "add process to ready queue:", pcb
         # if rescheduled because of time quantum, add at the end, if it's because of preemption, add to the beginning
         self.howToSchedule.addToReadyQueue(scheduler=self, pcb=pcb)
         return True
 
+    def __maintain_process_history(self, pcb):
+        """
+        usually, the history is maintained in the doWork()-Method in the Process-Class.
+        However the Ready-Section must be maintained here.
+        The Ready-Section is not part of the regular workplan.
+        """
+        if len(pcb.process.history.plan) == 0:
+            ready_time = 0
+        else:
+            ready_time = SystemTimer().next_temp_timeunit
+        new_history_section = Ready(ready_time)
+        new_history_section.starting_at = SystemTimer().timecounter
+        new_history_section.ending_at = SystemTimer().timecounter + ready_time
+        pcb.process.history.insert(new_history_section, i=len(pcb.process.history.plan))
 
 class SchedulerFactory(object):
     """

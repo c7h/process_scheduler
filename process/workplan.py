@@ -12,8 +12,24 @@ class TimeSection(Section):
         # time cannot be negative:
         if duration < 0:
             raise ValueError("Time cannot be negative!")
-        self.duration = duration
+        self.__duration = duration
+        self.__starting_at = None  # used to keep track of history events
 
+    @property
+    def starting_at(self):
+        return self.__starting_at
+
+    @starting_at.setter
+    def starting_at(self, time):
+        self.__starting_at = time
+
+    @property
+    def duration(self):
+        return self.__duration
+
+    @duration.setter
+    def duration(self, time):
+        self.__duration = time
 
     def __cmp__(self, other):
         return self.duration - other.duration
@@ -39,6 +55,11 @@ class Wait(TimeSection):
         return "Wait(%i)" % self.duration
 
 
+class Ready(TimeSection):
+    def __repr__(self):
+        return "Ready(%i)" % self.duration
+
+
 class Launch(ActionSection):
     def __init__(self, action):
         # assert isinstance(action, PCB)
@@ -58,7 +79,6 @@ class Workplan(object):
     def __init__(self):
         self.plan = list()
         self.__pmanager = ProcessManager()
-        self.ending_at = None # used for workplan
 
     # you can combine these functions in a row. they will get added to the plan
     def work(self, time):
@@ -127,15 +147,13 @@ class Workplan(object):
         """
         try:
             if isinstance(self.plan[-1], type):
-                #if last section is the defined Type, combine both section times
+                # if last section is the defined Type, combine both section times
                 old_section = self.plan.pop()
                 time = old_section.duration + time
         except IndexError:
             pass
         return time
 
-
     def __repr__(self):
         plan = map(lambda x: repr(x), self.plan)
         return "<Workplan: %s>" % "->".join(plan)
-

@@ -64,6 +64,7 @@ class Process(object):
 
         new_history_section = deepcopy(active_section)  # create a copy of the section
 
+
         if time is None:
             time = active_section.duration # work till the end of the active section (typically for FiFo)
 
@@ -76,7 +77,8 @@ class Process(object):
             self.workplan.insert(active_section)  # don't touch active_section from now an...
 
         new_history_section.duration = worked_time  # time spent working...
-        new_history_section.ending_at = SystemTimer().timecounter
+        new_history_section.ending_at = SystemTimer().timecounter # injecting a new attribute
+        new_history_section.starting_at = SystemTimer().timecounter - worked_time
         self.history.insert(new_history_section, i=len(self.history.plan))  # insert element at the end of the history
 
         # - decide if we should update system timer here or at the scheduler after call (work).
