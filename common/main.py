@@ -23,6 +23,11 @@ welcome = u"""
 """
 
 def main():
+    """
+    REPL-environment CLI-Client
+    :return:
+    """
+
     print welcome
 
     while True:

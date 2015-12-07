@@ -139,7 +139,6 @@ class DoWorkCase(unittest.TestCase):
         self.assertEqual(p.history, Workplan().work(10).launch(b))
 
 
-
     def test_process_terminated_01(self):
         p1 = Process("I_will_terminate")
         p1.workplan = Workplan().work(12)

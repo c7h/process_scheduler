@@ -7,7 +7,7 @@ class ProcessManager(object):
     """
     The Process Manager is responsible for managing the PCBs.
     It holds records for every Process in a Table-Like structure called PCB.
-    The PCB registers a the ProcessManager a creation time. If there is already
+    The PCB registers at the ProcessManager at creation time. If there is already
     a PCB with a process with the same name, a Value error is raised.
     There is only one Process Manager in the System.
     """
