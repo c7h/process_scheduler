@@ -209,6 +209,9 @@ class Scheduler(TimerListener):
             ready = self.ready_queue.pop()
             self.__refilQuantum(ready)  # refill quantum for next process in cpu
             self.cpu.dispatch(ready)
+            # update system timer
+            work_duration = ready.process.workplan.head().duration
+            SystemTimer().next_tick_in(work_duration)
             next_run = True
         elif active and readyq_empty:
             # cpu voll, runq leer
@@ -270,14 +273,17 @@ class Scheduler(TimerListener):
         However the Ready-Section must be maintained here.
         The Ready-Section is not part of the regular workplan.
         """
-        if len(pcb.process.history.plan) == 0:
-            ready_time = 0
-        else:
-            ready_time = SystemTimer().next_temp_timeunit
+        # if len(pcb.process.history.plan) == 0:
+        #     ready_time = 0
+        # else:
+        #     ready_time = SystemTimer().next_temp_timeunit
+        # @TODO: fix this ugly method...
+        ready_time = 0
         new_history_section = Ready(ready_time)
         new_history_section.starting_at = SystemTimer().timecounter
         new_history_section.ending_at = SystemTimer().timecounter + ready_time
         pcb.process.history.insert(new_history_section, i=len(pcb.process.history.plan))
+
 
 class SchedulerFactory(object):
     """
