@@ -63,14 +63,19 @@ class StrategyEvaluatorTestCase(SimpleFiFoScenario):
         avg_usage = self.evaluator.getAverageCPUusage()
         self.assertEqual(avg_usage, expected)
 
-    def testPeriodDuration(self):
+    def test_PeriodDuration(self):
         duration = self.evaluator.getPeriodDuration()
         self.assertEqual(duration, 35)
 
+    def test_getMeanResponseTime(self):
+        # in this case, the mean response time is 0
+        mean_r = self.evaluator.getMeanResponseTime()
+        self.assertEqual(mean_r, 0.0)
 
-class StrategyEvaluatorComplexTestCase(FiFoScenario2):
+
+class ProcessEvaluatorComplexTestCase(FiFoScenario2):
     def setUp(self):
-        super(StrategyEvaluatorComplexTestCase, self).setUp()
+        super(ProcessEvaluatorComplexTestCase, self).setUp()
         scheduler = SchedulerFactory.getScheduler("FiFo", timeslice=10)
         scheduler.initialize("A")
         scheduler.run()
@@ -112,6 +117,28 @@ class StrategyEvaluatorComplexTestCase(FiFoScenario2):
         waittime = self.evaluator.getWaitTime("B")
         self.assertEqual(waittime, 10)
 
+
+class StrategyEvaluatorComplexTestCase(FiFoScenario2):
+    def setUp(self):
+        super(StrategyEvaluatorComplexTestCase, self).setUp()
+        scheduler = SchedulerFactory.getScheduler("FiFo", timeslice=10)
+        scheduler.initialize("A")
+        scheduler.run()
+
+        self.evaluator = StrategyEvaluator()
+
+
+    def test_getAverageCPUusage(self):
+        cpu_usage = self.evaluator.getAverageCPUusage()
+        self.assertEqual(cpu_usage, 1.0)
+
+    def test_getPeriodDuration(self):
+        periodDuration = self.evaluator.getPeriodDuration()
+        self.assertEqual(periodDuration, 40)
+
+    def test_getMeanResponseTime(self):
+        meanRT = self.evaluator.getMeanResponseTime()
+        self.assertEqual(meanRT, 7.5)
 
 if __name__ == '__main__':
     unittest.main()

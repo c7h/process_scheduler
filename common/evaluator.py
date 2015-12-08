@@ -126,10 +126,15 @@ class ProcessEvaluator(BaseEvaluator):
 
 
 class StrategyEvaluator(BaseEvaluator):
+    def __init__(self):
+        super(StrategyEvaluator, self).__init__()
+        self.__pe = ProcessEvaluator()
+
+
     def getAverageCPUusage(self):
         """
-        the average CPU usage is a value from 0-100.
-        remeber! period duration / busy time (time where cpu was not idle)
+        Measurement for cpu utilization. The average CPU usage is a value from 0.0 - 1.0
+        Remember: period duration / busy time (time where cpu was not idle)
         :return: float
         """
 
@@ -172,9 +177,27 @@ class StrategyEvaluator(BaseEvaluator):
         :return: int
         """
         # find the process with the latest endpoint in history
-        pe = ProcessEvaluator()
         last_sections = list()
         for p in self.manager.jobs:
-            period = pe.getPeriodForPCB(p)
+            period = self.__pe.getPeriodForPCB(p)
             last_sections.append(period[1])
         return max(last_sections)
+
+    def getMeanResponseTime(self):
+        """
+        mean response time of the system: response times in the system divided by number of ready-events
+        :return: float / mean response time of the system
+        """
+        collected_response_times = list()
+        for p in self.manager.jobs:
+            response_time_list = self.__pe.getResponseTime(p)
+            # we have response time objects of 0 len in the list
+            # because we also add ready-events at the launch, even if the process will run right after launch.
+            response_time_list = filter(lambda s: s > 0, response_time_list) # filter out the 0's
+            collected_response_times.extend(response_time_list)
+        try:
+            number_of_events = len(collected_response_times)
+            mean_response_time = sum(collected_response_times) / float(number_of_events)
+        except ZeroDivisionError:
+            mean_response_time = 0.0
+        return mean_response_time
