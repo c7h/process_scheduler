@@ -13,12 +13,36 @@ class ProcessEvaluator(BaseEvaluator):
     :return: tuple(from, to)
     """
 
-    def getAverageWaitingTime(self, pcb_or_str):
-        raise NotImplementedError
+    def getTurnaroundTime(self, pcb_or_str):
+        """
+        Turnaround time = WaitTime + ServiceTime
+        :param pcb_or_str: PCB Name or PCB object
+        :return:
+        """
+        pcb = self.__arg_to_pcb(pcb_or_str)
+        waitTime = self.getWaitTime(pcb)
+        serviceTime = self.getServiceTime(pcb)
+        return waitTime + serviceTime
+
+    def getResponseTime(self, pcb_or_str):
+        """
+        time from launch til the first reaction of the process.
+        A response time is linked to an event, so a list of response times is returned.
+        :param pcb_or_str: PCB Name or PCB object
+        :return: list of response times.
+        """
+        pcb = self.__arg_to_pcb(pcb_or_str)
+        response_times = map(lambda s: s.duration, self._getReadySectionsForPCB(pcb))
+        return response_times
 
     def getWaitTime(self, pcb_or_str):
-        """Summe aller Zeitraeume, in denen Prozess auf irgend etwas wartet.
-        Bei uns: Zeit in Zustaenden W und B"""
+        """
+        Summe aller Zeitraeume, in denen Prozess auf irgend etwas wartet.
+        Dies kann entwender bedeuten, dass sich der Prozess im Zustand W, also in der EAQueue, oder
+        im Zustand B, also in der Bereitliste befand.
+        :param pcb_or_str: PCB Name or PCB object
+        :return: int / complete waiting time
+        """
         pcb = self.__arg_to_pcb(pcb_or_str)
         waiting_sections = self.getHistorySectionByType(pcb, Wait)
         ready_sections = self.getHistorySectionByType(pcb, Ready)
@@ -26,16 +50,23 @@ class ProcessEvaluator(BaseEvaluator):
         waiting_times = sum(map(lambda x: x.duration, waiting_sections))
         return waiting_times
 
-
     def getServiceTime(self, pcb_or_str):
-        """Summe aller Zeitraume, in denen Prozess die CPU belegt Bei uns: Zeit in Zustand L"""
+        """
+        Summe aller Zeitraume, in denen Prozess die CPU belegt Bei uns: Zeit in Zustand L
+        :param pcb_or_str: PCB Name or PCB object
+        :return: int / computing time
+        """
         pcb = self.__arg_to_pcb(pcb_or_str)
         busy_sections = self.getHistorySectionByType(pcb, Work)
         service_time = sum(map(lambda x: x.duration, busy_sections))
         return service_time
 
-
     def getPeriodForPCB(self, pcb_or_str):
+        """
+        Liefert fuer einen PCB den Anfangs- und Endzeitpunkt
+        :param pcb_or_str: PCB Name or PCB object
+        :return: Tuple (start, end)
+        """
         pcb = self.__arg_to_pcb(pcb_or_str)
 
         try:
@@ -50,7 +81,12 @@ class ProcessEvaluator(BaseEvaluator):
             return (first_occured_at, terminating_at)
 
     def __arg_to_pcb(self, pcb_or_str):
-        """the promisse to return a pcb object...."""
+        """
+        convert a string (name of the PCB) to PCB-object
+        :raises: ProcessNotFound
+        :param pcb_or_str: PCB Name or PCB object
+        :return: pcb
+        """
         if isinstance(pcb_or_str, str):
             pcb = self.manager.getProcessByName(pcb_or_str)
         else:
@@ -61,7 +97,7 @@ class ProcessEvaluator(BaseEvaluator):
         """
         some ready sections are not part of the history yet or are too short.
         This function fills this holes
-        :param pcb_or_str: Name of the PCB or PCB-Object itself
+        :param pcb_or_str: PCB Name or PCB object
         :return: list of ready sections
         """
         pcb = self.__arg_to_pcb(pcb_or_str)
@@ -69,20 +105,18 @@ class ProcessEvaluator(BaseEvaluator):
         for i in range(len(pcb.process.history.plan)):
             cur = pcb.process.history.plan[i]
             try:
-                ne = pcb.process.history.plan[i+1]
+                ne = pcb.process.history.plan[i + 1]
             except IndexError:
                 # no more next object
                 break
             if isinstance(cur, Ready):
                 cur.ending_at = ne.starting_at
-                cur.duration = cur.ending_at - cur.starting_at # udpdate duration
+                cur.duration = cur.ending_at - cur.starting_at  # udpdate duration
                 ready_secs.append(cur)
         return ready_secs
 
-
-
     def getHistorySectionByType(self, pcb, SectionType):
-        if isinstance(SectionType, Ready):
+        if issubclass(SectionType, Ready):
             # generate the ready sections on demand
             section_times = self._getReadySectionsForPCB(pcb)
         else:
@@ -98,7 +132,6 @@ class StrategyEvaluator(BaseEvaluator):
         remeber! period duration / busy time (time where cpu was not idle)
         :return: float
         """
-
 
         idle_time = 0
         busy_sections = list()
@@ -130,12 +163,8 @@ class StrategyEvaluator(BaseEvaluator):
         period_duration = self.getPeriodDuration()
         busy_time = period_duration - idle_time
 
-        cpu_utilization = float(busy_time)/float(period_duration)
+        cpu_utilization = float(busy_time) / float(period_duration)
         return cpu_utilization
-
-
-
-
 
     def getPeriodDuration(self):
         """

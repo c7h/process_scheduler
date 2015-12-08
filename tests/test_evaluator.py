@@ -48,6 +48,7 @@ class ProcessEvaluatorTestCase(SimpleFiFoScenario):
         self.assertEqual(wait_time, 0)
 
 
+
 class StrategyEvaluatorTestCase(SimpleFiFoScenario):
     def setUp(self):
         super(StrategyEvaluatorTestCase, self).setUp()
@@ -73,6 +74,7 @@ class StrategyEvaluatorComplexTestCase(FiFoScenario2):
         scheduler = SchedulerFactory.getScheduler("FiFo", timeslice=10)
         scheduler.initialize("A")
         scheduler.run()
+
         self.evaluator = ProcessEvaluator()
 
     def test_getReadySectionsForPCB_01(self):
@@ -85,6 +87,30 @@ class StrategyEvaluatorComplexTestCase(FiFoScenario2):
         # process B got a ready section at 10-20 after launch
         ready_secs = self.evaluator._getReadySectionsForPCB("B")
         self.assertEqual(len(ready_secs), 1)
+
+    def test_geResponseTime_01(self):
+        response_time = self.evaluator.getResponseTime("A")
+        self.assertListEqual([0, 5], response_time)
+
+    def test_geResponseTime_02(self):
+        response_time = self.evaluator.getResponseTime("B")
+        self.assertListEqual([10], response_time)
+
+    def test_getTurnaroundTime_01(self):
+        turnaroundtime = self.evaluator.getTurnaroundTime("A")
+        self.assertEqual(turnaroundtime, 35)
+
+    def test_getTurnaroundTime_02(self):
+        turnaroundtime = self.evaluator.getTurnaroundTime("B")
+        self.assertEqual(turnaroundtime, 15)
+
+    def test_getWaitTime_01(self):
+        waittime = self.evaluator.getWaitTime("A")
+        self.assertEqual(waittime, 15)
+
+    def test_getWaitTime_02(self):
+        waittime = self.evaluator.getWaitTime("B")
+        self.assertEqual(waittime, 10)
 
 
 if __name__ == '__main__':
