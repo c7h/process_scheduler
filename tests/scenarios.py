@@ -30,9 +30,7 @@ class SimpleFiFoScenario(unittest.TestCase):
         self.pcb2 = PCB(p2)
         p2.workplan = Workplan().work(10)
         p1.workplan = Workplan().work(10).launch('B').wait(15).work(10)
-        scheduler = SchedulerFactory.getScheduler("FiFo", timeslice=10)
-        scheduler.initialize("A")
-        scheduler.run()
+
 
     def tearDown(self):
         ProcessManager._drop()
@@ -45,10 +43,6 @@ class FiFoScenario2(unittest.TestCase):
         pcb2 = PCB(Process("B"))
         pcb1.process.workplan = Workplan().work(10).launch("B").work(10).wait(10).work(5)
         pcb2.process.workplan = Workplan().work(15)
-
-        scheduler = SchedulerFactory.getScheduler("FiFo", timeslice=10)
-        scheduler.initialize("A")
-        scheduler.run()
 
     def tearDown(self):
         ProcessManager._drop()

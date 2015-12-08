@@ -3,14 +3,19 @@ from scenarios import SimpleFiFoScenario, FiFoScenario2
 
 from common.evaluator import ProcessEvaluator, StrategyEvaluator
 from process.workplan import Work, Wait, Ready
+from scheduler.core import SchedulerFactory
 
 
 
 
 class ProcessEvaluatorTestCase(SimpleFiFoScenario):
     def setUp(self):
-        self.evaluator = ProcessEvaluator()
         super(ProcessEvaluatorTestCase, self).setUp()
+        scheduler = SchedulerFactory.getScheduler("FiFo", timeslice=10)
+        scheduler.initialize("A")
+        scheduler.run()
+
+        self.evaluator = ProcessEvaluator()
 
     def test_getPeriodForPCB_01(self):
         # test get pcb by name
@@ -45,8 +50,12 @@ class ProcessEvaluatorTestCase(SimpleFiFoScenario):
 
 class StrategyEvaluatorTestCase(SimpleFiFoScenario):
     def setUp(self):
-        self.evaluator = StrategyEvaluator()
         super(StrategyEvaluatorTestCase, self).setUp()
+        scheduler = SchedulerFactory.getScheduler("FiFo", timeslice=10)
+        scheduler.initialize("A")
+        scheduler.run()
+
+        self.evaluator = StrategyEvaluator()
 
     def test_averageCPUusage(self):
         expected = 30.0 / 35.0  # remeber: at least one value has to be a float!
@@ -60,8 +69,11 @@ class StrategyEvaluatorTestCase(SimpleFiFoScenario):
 
 class StrategyEvaluatorComplexTestCase(FiFoScenario2):
     def setUp(self):
-        self.evaluator = ProcessEvaluator()
         super(StrategyEvaluatorComplexTestCase, self).setUp()
+        scheduler = SchedulerFactory.getScheduler("FiFo", timeslice=10)
+        scheduler.initialize("A")
+        scheduler.run()
+        self.evaluator = ProcessEvaluator()
 
     def test_getReadySectionsForPCB_01(self):
         # process A got a ready section at 30 - 35 after wait

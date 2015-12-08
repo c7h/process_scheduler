@@ -4,8 +4,6 @@ from scheduler.core import Scheduler
 from strategy.simple import FiFo, RoundRobin
 
 
-
-
 class FiFoStrateyTestCase(BaseScenario):
     """
     expected result:
