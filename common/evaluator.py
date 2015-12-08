@@ -15,12 +15,12 @@ class ProcessEvaluator(BaseEvaluator):
 
     def getTurnaroundTime(self, pcb_or_str):
         """
-        Turnaround time = WaitTime + ServiceTime
+        Turnaround time = Time spent in EAQueue + Time spent in CPU
         :param pcb_or_str: PCB Name or PCB object
         :return:
         """
         pcb = self.__arg_to_pcb(pcb_or_str)
-        waitTime = self.getWaitTime(pcb)
+        waitTime = sum(map(lambda s: s.duration, self.getHistorySectionByType(pcb, Wait)))
         serviceTime = self.getServiceTime(pcb)
         return waitTime + serviceTime
 
