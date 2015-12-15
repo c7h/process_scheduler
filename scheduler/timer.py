@@ -21,11 +21,22 @@ class SystemTimer(object):
         :return:
         """
         self.timecounter = 0
-        self.timeunit = timeunit
+        self._timeunit = timeunit
         self.next_temp_timeunit = timeunit # initial to timeunit
         self.last_tick_duration = 0  # the duration of the last performed tick
 
         self.__listeners = []
+
+    @property
+    def timeunit(self):
+        return self._timeunit
+
+    @timeunit.setter
+    def timeunit(self, time):
+        assert time > 0
+        if self.timecounter > 0:
+            raise RuntimeWarning("timecounter was already greater than 0 as you tried to set a new timeunit")
+        self._timeunit = time
 
     #items can register at the SystemTimer to get notified (Observer Pattern)
 

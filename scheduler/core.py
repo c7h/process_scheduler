@@ -23,14 +23,27 @@ class Scheduler(TimerListener):
         self.cpu = CPU()  # that's what we want to manage
         self.processManager = ProcessManager()  # is responsible for managing processes
         self.ea_queues = [EAQueue()] * 1
-
         self.ready_queue = list()  # hold only processes waiting for the cpu
-
         self.init_process = None  # you have to initialize the scheduler first
 
-        SystemTimer().register(self)  # register at system clock
 
         self._loop_counter = 0  # count how many time the run-method was called
+
+        # every process needs the same quantum at beginning of the run
+        try:
+            quantum = strategy.__getattribute__("quantum")
+        except AttributeError:
+            quantum = 4
+        self.processManager.setQuantumForEveryProcess(quantum) # TODO:move to run-method
+
+        try:
+            timeslice = strategy.__getattribute__("timeslice")
+        except AttributeError:
+            timeslice = 10
+
+        SystemTimer().timeunit = timeslice
+        SystemTimer().register(self)  # register at system clock
+
 
     def popFromReadyQueue(self):
         """
@@ -317,5 +330,6 @@ class SchedulerFactory(object):
         assert isinstance(strategy_str, str)
         for possible, strategy in cls.__zuordnung.iteritems():
             if strategy_str.lower() == possible.lower():
-                return Scheduler(strategy(timeslice, quantum))
+                chosen_strategy = strategy(timeslice, quantum)
+                return Scheduler(chosen_strategy)
         raise NotImplementedError("the requested scheduler [%s] could not be found. typo?" % strategy_str)

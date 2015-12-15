@@ -120,27 +120,28 @@ class Process(object):
 
 
 class PCB(object):
-    def __init__(self, process, prio=0, state=State.I, quantum=4, timeslice=10, deadline=10):
+    def __init__(self, process, prio=0, state=State.I, quantum=4, deadline=10):
         assert isinstance(prio, int)
         self.state = state  # initial state is inactive
         self.process = process  # a process can't exist without a pcb in our system (composite)
         self.priority = prio
 
         self.__quantum = quantum
-        self.__timeslice = timeslice
         self.__remaining_time = 0
         self.__deadline = deadline
 
         ProcessManager().addPCB(self)  # register at the Manager, please
 
-    def refill_time_quantum(self):
+    @property
+    def quantum(self):
+        return self.__quantum
+
+    @quantum.setter
+    def quantum(self, quantum):
+        self.__quantum = quantum
+
+    def refill_quantum(self):
         raise NotImplementedError("implement me")
-
-    def getTimeLeftInCurrentSection(self):
-
-        self.process
-        # raise NotImplementedError("todo: implement me")
-
 
     # state setter... there are some boundaries due to the rules of our state-machine.
     # The following transition are allowed (besides calling the same state again - these calls have no effect)
