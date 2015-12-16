@@ -3,13 +3,10 @@ from random import choice
 from uuid import uuid1
 from warnings import warn
 from copy import copy, deepcopy
-
 from state import State
-
 from workplan import Workplan
 from manager import ProcessManager
 from scheduler.timer import SystemTimer
-
 from common.types import ProcessTerminatedMessage
 
 
@@ -64,9 +61,8 @@ class Process(object):
 
         new_history_section = deepcopy(active_section)  # create a copy of the section
 
-
         if time is None:
-            time = active_section.duration # work till the end of the active section (typically for FiFo)
+            time = active_section.duration  # work till the end of the active section (typically for FiFo)
 
         worked_time = min(active_section.duration, time)  # calculate time you can spend in section
 
@@ -77,7 +73,7 @@ class Process(object):
             self.workplan.insert(active_section)  # don't touch active_section from now an...
 
         new_history_section.duration = worked_time  # time spent working...
-        new_history_section.ending_at = SystemTimer().timecounter # injecting a new attribute
+        new_history_section.ending_at = SystemTimer().timecounter  # injecting a new attribute
         new_history_section.starting_at = SystemTimer().timecounter - worked_time
         self.history.insert(new_history_section, i=len(self.history.plan))  # insert element at the end of the history
 
@@ -93,9 +89,6 @@ class Process(object):
         if worked_time < time:
             self.doWork(time - worked_time)
         return new_history_section
-
-
-
 
     def _unique_name(self):
         """
@@ -127,10 +120,19 @@ class PCB(object):
         self.priority = prio
 
         self.__quantum = quantum
+        self.__quantum_initial = quantum
         self.__remaining_time = 0
         self.__deadline = deadline
 
         ProcessManager().addPCB(self)  # register at the Manager, please
+
+    @property
+    def quantum_initial(self):
+        return self.__quantum_initial
+
+    @quantum_initial.setter
+    def quantum_initial(self, initial_quantum):
+        self.__quantum_initial = initial_quantum
 
     @property
     def quantum(self):
@@ -140,8 +142,23 @@ class PCB(object):
     def quantum(self, quantum):
         self.__quantum = quantum
 
+    def decrease_quantum(self, delta_quantum=1):
+        """
+        as the names says it: the quantum gets decreased by a defined value (if possible)
+        :param delta_quantum:
+        :raises: ValueError: if quantum would result in a value below zero, which is not possible.
+        :return: None
+        """
+        assert delta_quantum >= 0 # makes sure no prankster give us a negative value here...
+        if self.quantum - delta_quantum >= 0:
+            self.quantum -= delta_quantum
+        else:
+            raise ValueError("Cannot decrement value by %i, because the current value is %i" % (delta_quantum, self.quantum))
+
+
     def refill_quantum(self):
-        raise NotImplementedError("implement me")
+        self.quantum = self.__quantum_initial
+        print "refilled quantum for process %s by %i to %i" % (self.process.name, self.__quantum_initial, self.quantum)
 
     # state setter... there are some boundaries due to the rules of our state-machine.
     # The following transition are allowed (besides calling the same state again - these calls have no effect)

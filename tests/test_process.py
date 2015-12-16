@@ -32,6 +32,7 @@ class ProcessCase(unittest.TestCase):
         self.assertFalse(duplette, "Unique-Test failed!")
 
 
+
 class PCBCase(unittest.TestCase):
     def setUp(self):
         # generate a list of 10 processes
@@ -48,6 +49,16 @@ class PCBCase(unittest.TestCase):
 
     def test_pcb_prio_type(self):
         self.assertRaises(AssertionError, PCB, self.processes[0], 'wrong_priority_type')
+
+    def test_decrease_quantum_01(self):
+        p = PCB(self.processes.pop(), quantum=10)
+        p.decrease_quantum(10)
+        self.assertEqual(p.quantum, 0)
+
+    def test_decrease_quantum_02(self):
+        p = PCB(self.processes.pop(), quantum=10)
+        self.assertRaises(ValueError, p.decrease_quantum, 11)
+
 
     def tearDown(self):
         ProcessManager._drop()
