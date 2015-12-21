@@ -151,6 +151,13 @@ class CPU(Resource, TimerListener):
         else:
             SystemTimer().next_tick_in(future_section.duration)
 
+        # trying to decrease quantum
+        if SystemTimer().timehammer and time > 0 and running_pcb != None:
+            try:
+                running_pcb.decrease_quantum()
+            except ValueError as e:
+                print "CPU notification: ", e
+
         print "<--- [%i] CPU work section left at %i" % (time, SystemTimer().timecounter)
 
     @property

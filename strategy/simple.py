@@ -1,5 +1,4 @@
 __author__ = 'Christoph Gerneth'
-
 from strategy import SimpleStrategy
 
 
@@ -39,6 +38,11 @@ class RoundRobin(SimpleStrategy):
         :param scheduler: the core scheduler. provides api access to everything you need for scheduling
         :return: PCB or None
         """
+        running = scheduler.cpu.running_process
+        running_quantum = running.quantum
+        if running_quantum > 0:
+            # the running pcb still has quantum left. Therefore it is allowed to keep the CPU
+            return running
         if len(scheduler.ready_queue) > 0:
             return scheduler.ready_queue.pop(0)  # removes first pcb from ready queue and returns it
         else:

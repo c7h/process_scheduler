@@ -26,24 +26,23 @@ class Scheduler(TimerListener):
         self.ready_queue = list()  # hold only processes waiting for the cpu
         self.init_process = None  # you have to initialize the scheduler first
 
-
         self._loop_counter = 0  # count how many time the run-method was called
 
         # every process needs the same quantum at beginning of the run
         try:
-            quantum = strategy.__getattribute__("quantum")
+            self.quantum = strategy.__getattribute__("quantum")
         except AttributeError:
-            quantum = 4
-        self.processManager.setQuantumForEveryProcess(quantum) # TODO:move to run-method
+            self.quantum = 4
+        self.processManager.setQuantumForEveryProcess(
+            self.quantum)  # TODO:move to run-method / assuming here: processes are created before scheduler instantiates
 
         try:
-            timeslice = strategy.__getattribute__("timeslice")
+            self.timeslice = strategy.__getattribute__("timeslice")  # make timeslice public
         except AttributeError:
-            timeslice = 10
+            self.timeslice = 10
 
-        SystemTimer().timeunit = timeslice
+        SystemTimer().timeunit = self.timeslice
         SystemTimer().register(self)  # register at system clock
-
 
     def popFromReadyQueue(self):
         """
@@ -117,6 +116,7 @@ class Scheduler(TimerListener):
         Generische Arbeitsweise des Schedulers
         :return true if there will be a next run
         """
+        # TODO:remove this old block in the next commit
         next_run = False
 
         if self.cpu.running_process is None and self._loop_counter == 0:
@@ -220,7 +220,7 @@ class Scheduler(TimerListener):
         elif not active and not readyq_empty:
             # cpu leer, runq voll: dispatchen und nochmal laufen
             ready = self.ready_queue.pop()
-            self.__refilQuantum(ready)  # refill quantum for next process in cpu
+            ready.refill_quantum()  # refill quantum for next process in cpu
             self.cpu.dispatch(ready)
             # update system timer
             work_duration = ready.process.workplan.head().duration
@@ -231,7 +231,9 @@ class Scheduler(TimerListener):
             # there is no readyq_empty process...
             # reschedule: process in cpu belongs in cpu
             print 'reschedule process'
-            self.__refilQuantum(self.cpu.running_process)
+            if self.cpu.running_process.quantum == 0:
+                # quantum gets refilled, if process is allowed to run again and the quantum was already consumed
+                self.cpu.running_process.refill_quantum()
             next_run = True
         elif active and not readyq_empty:
             # cpu voll, runq voll
@@ -242,6 +244,7 @@ class Scheduler(TimerListener):
                 if strategy_result is not active:
                     # neuer process
                     old = self.cpu.dispatch(strategy_result)
+                    active = strategy_result  # the new active process is the strategy result
                     self.addToMatchingQueue(old)
         else:
             # unefined state
@@ -249,13 +252,6 @@ class Scheduler(TimerListener):
 
         self._loop_counter += 1  # count the scheduling-steps
         return next_run
-
-    def __refilQuantum(self, pcb):
-        """
-        refill the pcb's time quantum
-        :param pcb: pcb to refill
-        """
-        print "REFIL Quantum"
 
     def __check_ea_queues(self):
         """

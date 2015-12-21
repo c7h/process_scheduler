@@ -28,6 +28,14 @@ class SystemTimer(object):
         self.__listeners = []
 
     @property
+    def timehammer(self):
+        """
+        check if this is cyclic interrupt or not
+        :return: True if this is step is a planned one or False if it's because of early execution
+        """
+        return True if self.timecounter % self.timeunit == 0 else False
+
+    @property
     def timeunit(self):
         return self._timeunit
 

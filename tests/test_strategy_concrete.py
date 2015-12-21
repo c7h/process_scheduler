@@ -50,6 +50,11 @@ class RRStrategyTestCase(BaseScenario):
         start, end = self.pe.getPeriodForPCB("BAR")
         self.assertTupleEqual((10, 25), (start, end))
 
+    def test_RR_t5_q2(self):
+        self._run_rr(quantum=2, timeslice=5)
+        start, end = self.pe.getPeriodForPCB("FOO")
+        self.assertTupleEqual((0, 30), (start, end))
+
 
 if __name__ == '__main__':
     unittest.main()
