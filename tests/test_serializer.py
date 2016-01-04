@@ -3,6 +3,8 @@ from scenarios import FiFoScenario2
 from scheduler.core import SchedulerFactory
 from common.serializer import JsonSerializer
 
+import json
+
 class JSONSerializerTestCase(FiFoScenario2):
     def setUp(self):
         super(JSONSerializerTestCase, self).setUp()
@@ -12,7 +14,18 @@ class JSONSerializerTestCase(FiFoScenario2):
 
     def test_generate_01(self):
         serializer = JsonSerializer()
-        print serializer.generateJson()
+        data = serializer.generateJson()
+        print data
+        try:
+            json.loads(data)
+        except ValueError:
+            self.fail("json not valid")
+
+    def test_generate_data(self):
+        serializer = JsonSerializer()
+        data = serializer.generateData()
+        print data
+        self.assertIsInstance(data, dict)
 
 if __name__ == '__main__':
     unittest.main()
