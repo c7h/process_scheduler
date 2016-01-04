@@ -76,11 +76,13 @@ class MLScenario1(unittest.TestCase):
             process = Process(name=n)
             pcb = PCB(process, prio=p)
             if former_pcb != None:
-                wp = Workplan().work(10).launch(former_pcb)
+                wp = Workplan().work(10).launch(former_pcb).work(10)
             else:
                 wp = Workplan().work(10)  # last workplan does't need to launch a pcb
             pcb.process.workplan = wp
+            former_pcb = n
 
     def tearDown(self):
         ProcessManager._drop()
         SystemTimer._drop()
+
