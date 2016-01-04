@@ -26,7 +26,8 @@ process : process_name '\(' prio '\)' ;
 
 length : '\d+' ;
 letter : '[A-Z]' ;
-NEWLINE : '[\n]+' (%ignore) ;
+NEWLINE : '[\n|]+' (%ignore) ;
+SPACE : '[ ]+' (%ignore) ;
 """)
 
 
