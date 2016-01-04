@@ -1,6 +1,8 @@
 from process.manager import ProcessManager
 from process.workplan import Wait, Work, Ready, Launch
 from evaluator import StrategyEvaluator, ProcessEvaluator
+
+from uuid import uuid1
 import json
 
 
@@ -37,11 +39,11 @@ class JsonSerializer(object):
                     state = "ready"
 
                 job_dict = {"lane": self.getIDforLane(p),
-                            "id": "%s (id:%i)" % (section.__repr__(), id(section)),
+                            "id": uuid1().get_urn(),
                             "start": section.starting_at,
                             "end": section.starting_at + section.duration,
                             "state": state,
-                            "details": "implement me"
+                            "details": section.__repr__(),
                             }
 
                 items.append(job_dict)
@@ -59,7 +61,8 @@ class JsonSerializer(object):
                 launches.append(launch_event)
         return launches
 
-    def generateJson(self):
+
+    def __combineResult(self):
         period = self.se.getPeriodDuration()
         launches = self.__generateLaunches()
         items = self.__generateItems()
@@ -75,4 +78,20 @@ class JsonSerializer(object):
                 'launches': launches,
                 }
 
+        return data
+
+    def generateJson(self):
+        """
+        return a json in a defined format
+        :return: JSON-string
+        """
+        data = self.__combineResult()
         return json.dumps(data, indent=4, sort_keys=True)
+
+    def generateData(self):
+        """
+        return a dictionary of python-object in a defined format
+        :return: dict
+        """
+        data = self.__combineResult()
+        return data
