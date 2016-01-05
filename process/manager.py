@@ -61,3 +61,13 @@ class ProcessManager(object):
             raise IndexError('No more active processes')
         else:
             return active_candidates.pop()
+
+    def setQuantumForEveryProcess(self, quantum):
+        """
+        initially, we want to have every process the same amount of time quantum
+        :param quantum: time quantum / int
+        :return:
+        """
+        for p in self.jobs:
+            p.quantum_initial = quantum
+            p.quantum = quantum
