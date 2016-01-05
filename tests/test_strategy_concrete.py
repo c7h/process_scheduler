@@ -63,6 +63,7 @@ class MultilevelPriorityFiFo(MLScenario1):
         scheduler = Scheduler(strategy=strategy)
         scheduler.initialize("A")
         scheduler.run()
+        pass
 
 
 if __name__ == '__main__':

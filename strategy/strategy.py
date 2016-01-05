@@ -29,8 +29,10 @@ class SimpleStrategy(Strategy):
 
 class MultiLevelStrategy(Strategy):
     """
-    MultiLevel Strategies use as simple-strategy for the queue-in-decision
+    MultiLevel Strategies use as simple-strategy for the queue-in-decision.
+    Higher value is higher priority!!
     """
+
     def __init__(self):
         self.__secondaryStrategy = None
 
