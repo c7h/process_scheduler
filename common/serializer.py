@@ -61,12 +61,19 @@ class JsonSerializer(object):
                 launches.append(launch_event)
         return launches
 
+    def __generateStrategyEvaluation(self):
+        evaluation = dict()
+        evaluation["cpu utilization"] = self.se.getAverageCPUusage()
+        evaluation["mean response time"] = self.se.getMeanResponseTime()
+        return evaluation
 
     def __combineResult(self):
         period = self.se.getPeriodDuration()
         launches = self.__generateLaunches()
         items = self.__generateItems()
         lanes = [pe.process.name for pe in self.pm.jobs]
+
+        strategy_eval = self.__generateStrategyEvaluation()
 
         quantum_data = list()
 
@@ -76,6 +83,7 @@ class JsonSerializer(object):
                 'items': items,
                 'quantum_data': quantum_data,
                 'launches': launches,
+                'strategy evaluation': strategy_eval,
                 }
 
         return data
