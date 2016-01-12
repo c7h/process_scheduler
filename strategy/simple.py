@@ -11,8 +11,8 @@ class FiFo(SimpleStrategy):
 
     def schedule(self, scheduler):
         """
-        FiFo strategies will always return the first process in a queue. But because they are non-preemtive,
-        this happens only if there is no process running
+        FiFo strategies will always return the first process in a queue.
+        But since they are non-preemtive, only if there isn't a running process blocking the CPU
         """
         if scheduler.cpu.running_process:
             return scheduler.cpu.running_process
