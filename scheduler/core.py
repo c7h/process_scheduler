@@ -6,7 +6,7 @@ from resource import CPU, EAQueue
 from process.manager import ProcessManager
 from process.workplan import Work, Wait, Launch, Ready
 # imports used by Factory:
-from strategy.simple import FiFo, RoundRobin
+from strategy.simple import FiFo, RoundRobin, ShortesJobFirst
 from strategy.multilevel import MLsecondRR, MLsecondFiFo
 
 # endless recursion prevention
@@ -236,6 +236,7 @@ class SchedulerFactory(object):
     __zuordnung = {
         'fifo': FiFo,
         'roundrobin': RoundRobin,
+        'shortesjobfist': ShortesJobFirst,
         'mlsecondfifo': MLsecondFiFo,
         'mlsecondrr': MLsecondRR
     }

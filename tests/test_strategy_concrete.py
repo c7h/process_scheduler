@@ -2,7 +2,7 @@ import unittest
 from scenarios import BaseScenario, MLScenario1
 
 from scheduler.core import Scheduler
-from strategy.simple import FiFo, RoundRobin
+from strategy.simple import FiFo, RoundRobin, ShortesJobFirst
 from strategy.multilevel import MLsecondFiFo
 from common.evaluator import StrategyEvaluator, ProcessEvaluator
 
@@ -56,6 +56,24 @@ class RRStrategyTestCase(BaseScenario):
         self._run_rr(quantum=2, timeslice=5)
         start, end = self.pe.getPeriodForPCB("FOO")
         self.assertTupleEqual((0, 30), (start, end))
+
+
+class SJFStrategyTestCase(BaseScenario):
+    def setUp(self):
+        super(SJFStrategyTestCase, self).setUp()
+        self.pe = ProcessEvaluator()
+
+    def run_scheduler(self):
+        strategy = ShortesJobFirst()
+        scheduler = Scheduler(strategy=strategy)
+        scheduler.initialize("FOO")
+        scheduler.run()
+
+    def test_SJF_01(self):
+        self.run_scheduler()
+        start, end = self.pe.getPeriodForPCB("FOO")
+        self.assertTupleEqual((0,20), (start, end))
+
 
 class MultilevelPriorityFiFo(MLScenario1):
     def test_MLsndFiFo_01(self):

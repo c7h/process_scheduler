@@ -1,6 +1,6 @@
 __author__ = 'Christoph Gerneth'
+from common.evaluator import ProcessEvaluator
 from strategy import SimpleStrategy
-
 
 class FiFo(SimpleStrategy):
     def addToReadyQueue(self, scheduler, pcb):
@@ -21,6 +21,37 @@ class FiFo(SimpleStrategy):
                 return scheduler.ready_queue.pop()
             except:
                 return None
+
+class ShortesJobFirst(FiFo):
+
+    def __calculate_left_work(self, pcb):
+        """
+        we have to find out how much cpu-time is left in the workplan
+        :param pcb: the PCB of the target Process
+        :return: int. left service time
+        """
+        pe = ProcessEvaluator() # we 'abuse' the process evaluator
+        # @TODO: change this. The evaluator module is not meant to be used this way
+        service_time = pe.getServiceTime(pcb)
+        return service_time
+
+
+    def addToReadyQueue(self, scheduler, pcb):
+        """
+        Shortes Job First will sort the ready queue by remaining job lenght
+        :param scheduler: Scheduler
+        :param pcb: PCB to be added
+        """
+        left_duration =  self.__calculate_left_work(pcb)
+        queue = scheduler.ready_queue
+        index = len(queue)
+        for pcb_elem in queue:
+            if self.__calculate_left_work(pcb_elem) < left_duration :
+                # job lenght is lower than target => end of targets sub-queue
+                index = queue.index(pcb_elem)
+                break
+        queue.insert(index, pcb)
+
 
 
 class RoundRobin(SimpleStrategy):
