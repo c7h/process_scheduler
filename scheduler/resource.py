@@ -137,6 +137,7 @@ class CPU(Resource, TimerListener):
         else:
             if isinstance(what_was_done, Launch):
                 # cpu executed launch section
+                # launches are now executed in add-to-matching queue method in the core scheduler
                 pass
                 # @TODO: finish this shit
 
