@@ -1,14 +1,15 @@
 __author__ = 'christoph gerneth'
 
 import unittest
-from process.state import State
-from process.process import PCB, Process
-from process.workplan import Workplan
-from process.manager import ProcessManager
-from scheduler.resource import CPU, EAQueue
 
-from scheduler.timer import SystemTimer
-from common.types import ProcessTerminatedMessage
+from process_scheduler.process.state import State
+from process_scheduler.process.process import PCB, Process
+from process_scheduler.process.workplan import Workplan
+from process_scheduler.process.manager import ProcessManager
+from process_scheduler.scheduler.resource import CPU, EAQueue
+
+from process_scheduler.scheduler.timer import SystemTimer
+from process_scheduler.common.types import ProcessTerminatedMessage
 
 
 class TestCPUCase(unittest.TestCase):

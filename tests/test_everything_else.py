@@ -1,7 +1,7 @@
 __author__ = 'Christoph Gerneth'
 
 import unittest
-from common.types import SingletonType
+from process_scheduler.common.types import SingletonType
 
 class SingletonObject(object):
     __metaclass__ = SingletonType

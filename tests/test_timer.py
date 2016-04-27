@@ -1,7 +1,9 @@
 __author__ = 'Christoph Gerneth'
 
 import unittest
-from scheduler.timer import TimerListener, SystemTimer
+#import context as process_scheduler
+
+from process_scheduler.scheduler.timer import TimerListener, SystemTimer
 
 
 class Foobar(TimerListener):

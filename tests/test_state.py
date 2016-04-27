@@ -1,11 +1,11 @@
 __author__ = 'c7h'
 
 import unittest
-from process.state import State
 
+from process_scheduler.process.state import State
 #state machine test
-from process.process import PCB, Process
-from process.manager import ProcessManager
+from process_scheduler.process.process import PCB, Process
+from process_scheduler.process.manager import ProcessManager
 
 
 class StateCase(unittest.TestCase):

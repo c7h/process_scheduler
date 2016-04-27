@@ -1,7 +1,8 @@
 import unittest
 from scenarios import FiFoScenario2
-from scheduler.core import SchedulerFactory
-from common.serializer import JsonSerializer
+
+from process_scheduler.scheduler.core import SchedulerFactory
+from process_scheduler.common.serializer import JsonSerializer
 
 import json
 

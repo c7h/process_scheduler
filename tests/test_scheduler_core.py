@@ -1,16 +1,15 @@
 __author__ = 'c7h'
 
 import unittest
-from strategy.simple import FiFo, RoundRobin
-from strategy.simple import SimpleStrategy
-from strategy.multilevel import MLsecondFiFo, MLsecondRR
-from scheduler.core import Scheduler
-from scheduler.core import SchedulerFactory
-from scheduler.timer import SystemTimer
-from process.state import State
-from process.workplan import Workplan
-from process.process import Process, PCB
-from process.manager import ProcessManager
+
+from process_scheduler.strategy.simple import FiFo, RoundRobin, SimpleStrategy
+from process_scheduler.strategy.multilevel import MLsecondFiFo, MLsecondRR
+from process_scheduler.scheduler.core import Scheduler, SchedulerFactory
+from process_scheduler.scheduler.timer import SystemTimer
+from process_scheduler.process.state import State
+from process_scheduler.process.workplan import Workplan
+from process_scheduler.process.process import Process, PCB
+from process_scheduler.process.manager import ProcessManager
 
 
 class FiFoStubStrategy(SimpleStrategy):

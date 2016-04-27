@@ -1,10 +1,10 @@
 __author__ = 'c7h'
 
 import unittest
-from process.workplan import Workplan
-from process.workplan import Wait, Work
 
-from process.process import PCB, Process
+from process_scheduler.process.workplan import Workplan
+from process_scheduler.process.workplan import Wait, Work
+from process_scheduler.process.process import PCB, Process
 
 
 class TestWorkplan(unittest.TestCase):

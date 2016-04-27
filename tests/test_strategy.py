@@ -1,14 +1,15 @@
 __author__ = 'c7h'
 
 import unittest
-from strategy.multilevel import MLsecondFiFo
-from strategy.simple import FiFo
-from strategy.strategy import Strategy
 
-from scheduler.core import Scheduler
-from process.process import PCB, Process
-from process.manager import ProcessManager
-from scheduler.timer import SystemTimer
+from process_scheduler.strategy.multilevel import MLsecondFiFo
+from process_scheduler.strategy.simple import FiFo
+from process_scheduler.strategy.strategy import Strategy
+
+from process_scheduler.scheduler.core import Scheduler
+from process_scheduler.process.process import PCB, Process
+from process_scheduler.process.manager import ProcessManager
+from process_scheduler.scheduler.timer import SystemTimer
 
 
 

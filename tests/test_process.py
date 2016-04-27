@@ -1,11 +1,12 @@
 __author__ = 'christoph gerneth'
 
 import unittest
-from process.process import Process, PCB, State
-from process.manager import ProcessManager
-from process.workplan import Workplan, Launch
-from common.types import ProcessTerminatedMessage
-from scheduler.timer import SystemTimer
+
+from process_scheduler.process.process import Process, PCB, State
+from process_scheduler.process.manager import ProcessManager
+from process_scheduler.process.workplan import Workplan, Launch
+from process_scheduler.common.types import ProcessTerminatedMessage
+from process_scheduler.scheduler.timer import SystemTimer
 
 
 class ProcessCase(unittest.TestCase):
