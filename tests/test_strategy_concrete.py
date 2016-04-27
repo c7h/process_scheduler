@@ -1,10 +1,11 @@
 import unittest
+
 from scenarios import BaseScenario, MLScenario1
 
-from scheduler.core import Scheduler
-from strategy.simple import FiFo, RoundRobin, ShortesJobFirst
-from strategy.multilevel import MLsecondFiFo
-from common.evaluator import StrategyEvaluator, ProcessEvaluator
+from process_scheduler.scheduler.core import Scheduler
+from process_scheduler.strategy.simple import FiFo, RoundRobin, ShortesJobFirst
+from process_scheduler.strategy.multilevel import MLsecondFiFo
+from process_scheduler.common.evaluator import StrategyEvaluator, ProcessEvaluator
 
 
 class FiFoStrateyTestCase(BaseScenario):

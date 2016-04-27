@@ -1,8 +1,9 @@
 import unittest
-from process.manager import ProcessManager
-from process.process import Process, PCB, Workplan
-from scheduler.timer import SystemTimer
-from scheduler.core import SchedulerFactory
+
+from process_scheduler.process.manager import ProcessManager
+from process_scheduler.process.process import Process, PCB, Workplan
+from process_scheduler.scheduler.timer import SystemTimer
+from process_scheduler.scheduler.core import SchedulerFactory
 
 
 # Scenario collections for unittests

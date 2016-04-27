@@ -1,6 +1,6 @@
 __author__ = 'Christoph Gerneth'
 
-from common.types import SingletonType
+from process_scheduler.common.types import SingletonType
 
 class TimerListener(object):
 

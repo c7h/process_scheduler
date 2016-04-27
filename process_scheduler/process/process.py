@@ -3,11 +3,13 @@ from random import choice
 from uuid import uuid1
 from warnings import warn
 from copy import copy, deepcopy
+
 from state import State
 from workplan import Workplan
 from manager import ProcessManager
-from scheduler.timer import SystemTimer
-from common.types import ProcessTerminatedMessage
+
+from process_scheduler.scheduler.timer import SystemTimer
+from process_scheduler.common.types import ProcessTerminatedMessage
 
 
 class Process(object):

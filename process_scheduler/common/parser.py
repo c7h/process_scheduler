@@ -1,8 +1,8 @@
 __author__ = 'Christoph Gerneth'
 from plyplus import Grammar, STransformer
 
-from process.process import Process, PCB
-from process.workplan import Workplan
+from process_scheduler.process.process import Process, PCB
+from process_scheduler.process.workplan import Workplan
 
 # The Grammar is defined here. The Syntax is EBNF-like
 _syntaxParser = Grammar(r"""

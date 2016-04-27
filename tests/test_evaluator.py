@@ -1,11 +1,9 @@
 import unittest
 from scenarios import SimpleFiFoScenario, FiFoScenario2
 
-from common.evaluator import ProcessEvaluator, StrategyEvaluator
-from process.workplan import Work, Wait, Ready
-from scheduler.core import SchedulerFactory
-
-
+from process_scheduler.common.evaluator import ProcessEvaluator, StrategyEvaluator
+from process_scheduler.process.workplan import Work, Wait, Ready
+from process_scheduler.scheduler.core import SchedulerFactory
 
 
 class ProcessEvaluatorTestCase(SimpleFiFoScenario):

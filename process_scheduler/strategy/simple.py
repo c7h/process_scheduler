@@ -1,5 +1,5 @@
 __author__ = 'Christoph Gerneth'
-from common.evaluator import ProcessEvaluator
+from process_scheduler.common.evaluator import ProcessEvaluator
 from strategy import SimpleStrategy
 
 class FiFo(SimpleStrategy):

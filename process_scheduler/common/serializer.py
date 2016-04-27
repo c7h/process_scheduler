@@ -1,5 +1,5 @@
-from process.manager import ProcessManager
-from process.workplan import Wait, Work, Ready, Launch
+from process_scheduler.process.manager import ProcessManager
+from process_scheduler.process.workplan import Wait, Work, Ready, Launch
 from evaluator import StrategyEvaluator, ProcessEvaluator
 
 from uuid import uuid1

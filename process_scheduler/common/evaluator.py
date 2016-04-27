@@ -1,5 +1,5 @@
-from process.manager import ProcessManager
-from process.workplan import Work, Wait, Ready
+from process_scheduler.process.manager import ProcessManager
+from process_scheduler.process.workplan import Work, Wait, Ready
 
 
 class BaseEvaluator(object):

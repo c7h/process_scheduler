@@ -1,8 +1,14 @@
 __author__ = 'c7h'
 
 import unittest
-from common.parser import ProcessTransformer, WorkplanTransformer, _syntaxParser, parseSyntax, Workplan
-from process.workplan import ProcessManager
+
+from process_scheduler.common.parser import (
+    ProcessTransformer, 
+    WorkplanTransformer, 
+    _syntaxParser, 
+    parseSyntax, 
+    Workplan)
+from process_scheduler.process.workplan import ProcessManager
 
 
 class ParserTestCase(unittest.TestCase):
