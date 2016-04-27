@@ -1,8 +1,9 @@
 # coding=utf-8
 __author__ = 'Christoph Gerneth'
 
-from scheduler.core import SchedulerFactory
-from process.manager import ProcessManager
+from process_scheduler.scheduler.core import SchedulerFactory
+from process_scheduler.process.manager import ProcessManager
+
 from parser import parseSyntax  # we use the parser to create processes
 from evaluator import StrategyEvaluator, ProcessEvaluator
 

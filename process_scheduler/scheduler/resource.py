@@ -1,8 +1,8 @@
 __author__ = 'Christoph Gerneth'
 from timer import SystemTimer, TimerListener
-from process.process import PCB
-from process.workplan import Wait, Launch
-from common.types import ProcessTerminatedMessage
+from process_scheduler.process.process import PCB
+from process_scheduler.process.workplan import Wait, Launch
+from process_scheduler.common.types import ProcessTerminatedMessage
 
 
 class Resource(object):

@@ -1,13 +1,14 @@
 __author__ = 'Christoph Gerneth'
 import sys
-from strategy.strategy import Strategy
 from timer import TimerListener, SystemTimer
 from resource import CPU, EAQueue
-from process.manager import ProcessManager
-from process.workplan import Work, Wait, Launch, Ready
+
+from process_scheduler.strategy.strategy import Strategy
+from process_scheduler.process.manager import ProcessManager
+from process_scheduler.process.workplan import Work, Wait, Launch, Ready
 # imports used by Factory:
-from strategy.simple import FiFo, RoundRobin, ShortesJobFirst
-from strategy.multilevel import MLsecondRR, MLsecondFiFo
+from process_scheduler.strategy.simple import FiFo, RoundRobin, ShortesJobFirst
+from process_scheduler.strategy.multilevel import MLsecondRR, MLsecondFiFo
 
 # endless recursion prevention
 # actually there is a built-in recursion break provided by the python runtime environment:
